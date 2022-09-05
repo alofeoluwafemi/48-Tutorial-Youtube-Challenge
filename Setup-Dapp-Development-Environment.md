@@ -1,38 +1,40 @@
+## Setting Up a Dapp Development Scaffold
 
 
+![Setting Up a Dapp Development Scaffold](https://s3.amazonaws.com/alofe.oluwafemi/Dapp-Setup-Youtube-Banner.png)
 
-## Overview
-While building Dapps especially for a small project, it common place for developers to have seperate project folders for the frontend, backend and smart contract. Similarly some tools that I consider time saving and bug-saving (assuming that is a word) that developers can take advantage of such as **sollint**, **prettier**, **husky**, **slither**..., the list continues, are usually not used. 
+## Introduction
+In the past few months of building Dapps, for every new project, I find myself repeating the same process and setup over and over again. I ended up coming up with a dapp development preset has I've come to call it, which I would like to share with you for your use.
+
+In brief its a structure that allows you have your frontend (e.g Nextjs), backend (e.g Go, Node) and smart contract codes in the same project directory with the help of formatter, linter and pre-hooks to aid your development process.
+
 
 ## Disclaimer
 This is based on my personal opinion on how I've attempted to boostrap some persoanl Dapps, I've worked on and should not be considered as general opinion. However I accept suggestions and critics.  
 
-## What Will I Learn
-- How to structure your Dapp project
-- Configure Vscode with pretttier and solhint
-- Run Slither to catch common vulnerabilities in your contracts
-- Check  that you don't commit Private keys to Github
-- Configure husky for pre-push git-hook
-	- Run linter and formatter 
-	- Run vunurability checks using slither
-	- Check your smart contract test are passing
+## What you Will  Learn
+- Setting up a preset that you can repetitively use during your dapp development
+- Configure Vscode with pretttier and solhint to automate formatting and linter your Solidity and JS code
+- Setup Slither to run as a pre-commit hook to catch common vulnerabilities in your smart contracts code
+- Setup pre-commit check to ensure you don't commit Private keys to Github
+- Setup pre-commit check to ensure your smart contract test are passing
 
-You will get the whole idea of having your own custom preset. You can star my [preset structure here on github](https://github.com/alofeoluwafemi/dapp-development-preset) for your reference.
+By the end of this learning, you would have setup a dapp development environment for yourself that you can always use as a scaffold/bootstrap your process. You will improve it along the way to suite your own development requirements.
+
+Here is my own  [preset on Github for your reference](https://github.com/alofeoluwafemi/dapp-development-preset).
+
+## Difficulty
+- Intermidiate :white_check_mark:
 
 ## Requirement
 I would expect that you have `node` installed. I recommend using `nvm` to manage your `node` versions. Also this tutorial assumes you are using the Vscode editor.
-
-## Difficulty
-- Beginner :white_check_mark:
-- Intermidiate :white_check_mark:
-- Advance :white_check_mark:
-
-I created a Telegram group for anyone learning web3, you can using https://t.me/+Og9C3Z23lpc5MWRk. You will get access to free web3 resource, 1-on-1 and group live coding session and many other web3 resources.
 
 
 ## Step 1
 
 From your terminal, navigate to your project directory or create a new one as mine, initialize it as a npm project.
+
+[![Join Blockchain Academy] ()]
 
 ```bash
 mkdir dapp-setup-preset
@@ -43,7 +45,9 @@ git init
 
 ## Step 2
 
-Create the following files & folders:
+Create the following files & folders structure:
+
+```
 - src
 	- frontend
 	- backend
@@ -56,6 +60,11 @@ Create the following files & folders:
 - .gitignore
 - .prettierignore
 - prettierrc.json
+```
+
+The **frontend** folder would be hosting e.g your react code, **backend** folder hosting e.g your node or go code and finally **smart-contract** hosting your truffle and hardhat framework.  
+
+![Folder structure](https://s3.amazonaws.com/alofe.oluwafemi/Screen+Shot+2022-09-05+at+2.52.59+AM.png)
 
 ## Step 3
 
@@ -65,12 +74,21 @@ Installing dependecies & plugins.
 ![Install Prettier Plugin for Vscode](https://s3.amazonaws.com/alofe.oluwafemi/Screen+Shot+2022-08-30+at+8.40.43+PM.png)
 
 **Install solhint, prettier & configure both to work together**
-Run the commond below from the project root directory
+
+[Solhint](https://github.com/protofire/solhint) is a library and a command-line tool for static analysis of the Solidity code. This linter allows for detecting syntax-related security vulnerabilities, supports a wide range of rules, as well as enables to addition of new ones if necessary.
+
+[Prettier](https://prettier.io/docs/en/install.html)  is an opinionated code formatter with support for many languages and IDE.
+
+[Prettier-solidity](https://github.com/prettier-solidity/prettier-plugin-solidity) is a plugin that works hand-in-hand with Solhint. It helps to automatically fix many of the errors that Solhint finds.
+
+Solhint-plugin-prettier plugin lets you check that your solidity files are correctly formatted according to the [solidity plugin for Prettier](https://github.com/prettier-solidity/prettier-plugin-solidity)
+
+Now let install them by running the command below from the project root directory
 ```
-npm install --save-dev solhint prettier prettier-plugin-solidity husky solhint-plugin-prettier
+npm install --save-dev solhint prettier prettier-plugin-solidity solhint-plugin-prettier
 ```
 
-Open `.solhint.json` and paste below defualt configuration.
+Open `.solhint.json` and paste below default configuration on how we want our linter to behave.
 
 ```json
 {
@@ -101,7 +119,7 @@ test
 scripts
 types
 ```
-Open `prttierrc.json` file and paste the below configuration in.
+Open `prettierrc.json` file and paste the below prettier configuration in on how we want our prettier to behave.
 
 ```json
 {
@@ -143,7 +161,7 @@ Open `prttierrc.json` file and paste the below configuration in.
 
 You can read the [prettier documentation](https://prettier.io/docs/en/options.html) for further configuration.
 
-Finally lets us configure solhint to work nicely with prettier. [Prettier-solidity](https://github.com/prettier-solidity/prettier-plugin-solidity) is a Prettier for solidity files that works hand-in-hand with Solhint. It helps to automatically fix many of the errors that Solhint finds.
+Finally lets us configure solhint to work nicely with prettier. 
 
 Update `.solhint.json` to include `prettier` in the plugins option. Now your configuration should look something like this.
 
@@ -164,7 +182,11 @@ Update `.solhint.json` to include `prettier` in the plugins option. Now your con
 }
 ```
 ## Step 4
-Setup hardhat in the smart-contract directory.  Navigate to `src/smart-contracts` and run the below command.
+You need to setup hardhat in the smart-contract directory.  Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software. Hardhat comes built-in with Hardhat Network, a local Ethereum network designed for development.
+
+I choose to use hardhat because of its roboustness, but you can decide to use other framework of your choice, but know in that case, scripts in your package.json will slightly be different.
+
+Navigate to `src/smart-contracts` and run the below command.
 
 ⚠️ You should be running `npm` version 7.0.0+
 
@@ -177,7 +199,7 @@ npx hardhat
 
 ## Step 5
 
-Update your `package.json`, in the root folder , with some scripts to show you how you can run command in any of your project workspace under the `src` folder directly from the project root.
+Update your `package.json`, in the root folder , with some scripts, to show you how you can run command in any of your project workspace under the `src` folder directly from the project root.
 
 ```json
 {
@@ -210,7 +232,7 @@ Update your `package.json`, in the root folder , with some scripts to show you h
 }
 ``` 
 
-Nex update the `src/smart-contract/package.json` to match below.
+Nex update the `src/smart-contract/package.json` to match below containing scripts for linting and formatting our solidity code and smart contrat tests.
 
 ```json
 {
@@ -266,15 +288,21 @@ To also enforce some extensions, we need for solidity suggestions and tips using
 }
 ```
 
-You can try this out by opening `src/smart-contract/Lock.sol` in your editor and control save by holding `cmd + S` for mac and `ctrl+S` for window, you would see how it auto formats and also corrects `uint` to `uint256`. That is solhint and prettier doing easy fixes for you.
+You can try this out by opening `src/smart-contract/Lock.sol` in your editor and hold control save  `cmd + S` for mac and `ctrl+S` for window, you would see how it auto formats and also corrects `uint` to `uint256`. That is solhint and prettier doing easy fixes for you.
+
+**Hurray  🎉🎉🎉**
 
 ![solhint+prettier](https://s3.amazonaws.com/alofe.oluwafemi/ezgif.com-gif-maker+%281%29.gif)
 
+
 ## Step 7
 
-Setup a pre-commit hook using husky, you already have husky installed if you followed this tutorial correctly. From the project root terminal run:
+Install [Husky](https://typicode.github.io/husky/) to setup a pre-commit hook. 
+
+From the project root terminal run:
 
 ```bash
+npm install --save-dev husky
 npm set-script prepare "husky install"
 npm run prepare
 npx husky add .husky/pre-commit "npm run hardhat:lint"
@@ -382,4 +410,6 @@ PRIVATE_KEY="0x596F752063616E27742077697468647261772079657400000000000000000000"
 
 The commit process will exit with a status 1.
 
-Thank you for sticking this far with me, If you enjoyed this article you can support me by Clapping for this post and subscribing to my [Youtube Channel](https://www.youtube.com/channel/UCO3mWoCZ_iqRPRvUeg9oG2A).
+Thank you for sticking this far with me, If you enjoyed this article you can support me by Clapping for this post.
+
+[![Foo](https://s3.amazonaws.com/alofe.oluwafemi/Join+Blockchain+Academy.png)](https://t.me/+Og9C3Z23lpc5MWRk/)

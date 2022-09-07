@@ -34,8 +34,6 @@ I would expect that you have `node` installed. I recommend using `nvm` to manage
 
 From your terminal, navigate to your project directory or create a new one as mine, initialize it as a npm project.
 
-[![Join Blockchain Academy] ()]
-
 ```bash
 mkdir dapp-setup-preset
 cd dapp-setup-preset && code . // Open folder in Vscode

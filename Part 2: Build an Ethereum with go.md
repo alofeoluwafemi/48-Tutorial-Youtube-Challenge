@@ -48,10 +48,13 @@ Also make sure to get some [test ETH from Goerli](https://goerlifaucet.com/) , i
 - POST request to set USDC address on the Escrow contract
 - POST request to Deploy a new custodian wallet address
 - POST request to open a buy P2P order with USDC Balance
+- POST request to get seller USDC Balance
+
+### Part 3 DIY (Do It Yourself) 🤓
 - POST request to open a sell P2P order with USDC Balance
-- Handle Revert Errors in response
 - GET request to Get open orders for a vendor
 - GET request to Get order by ID
+- POST request to cancel P2P order
 
 ## P2P Order Webhooks
 
@@ -293,9 +296,27 @@ func (clientCon ClientConnection) GetAccountByUUID(uuid string) (*common.Address
 
 Restart the server and using Postman, make a GET request to http://127.0.0.1:3000/api/v1/factory/wallet/b93e42b0-33a2-11ed-a261-0242ac120002. Remember to change the uuid to the once you used ealier on and note both account address returned.
 
-In my own case my two acccount address are 
+In my own case my two acccount address returned are 
 
 | UUID | Account Address |
 |--|--|
 | b93e42b0-33a2-11ed-a261-0242ac120002 | 0xC1F07Db647Aa3002c12BbaF8D598F0ef19c4ddd3 |
 |cec3df26-339a-11ed-a261-0242ac120002|0x63cc2DD4d1836bA66B40B3dEBfcA7896256c24d0|
+
+### Fund the Account Addresses with USDC (Mock)
+
+Open Metamask and click on **import token**, enter the deployed USDC address, make sure you do that to the wallet address you used the Private key as deployer acccount in env. All initial token will be assigned the account, see image below.
+
+![Import Token](https://s3.amazonaws.com/alofe.oluwafemi/Screen+Shot+2022-09-14+at+3.40.32+AM.png)
+
+Fund both  addressess with 100 USDC using metamask.
+
+### Open P2P Buy Order
+The `newBuyOrder` function is directly available on the wallet address. Remember each wallet is a smart contract and not an EOA, like you would expect. And our deployer account has like the super admin priviledge to call methods on it. 
+
+This system is making use of a proxy contract approach, such that in the future we can add more features to already deployed wallet by simply upgrading the Wallet Logic which is never executed on its own but its functions called via `delegatecall`.
+
+
+
+
+### Get Account Total Balance After Open Order

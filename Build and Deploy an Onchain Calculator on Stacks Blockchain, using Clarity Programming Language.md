@@ -5,13 +5,13 @@
 
 ## Introduction 
 
-Just 2 weeks ago, I didn't know about the **stacks blockchain**, and beyond the usual speculating or holding of bitcoin like most people,  I didn't care to find out if its now possible to build dapps on the bitcoin blockchain.
+Just two weeks ago, I was unaware of the stacks blockchain and didn't care to learn whether it was now possible to create dapps on the bitcoin blockchain beyond the typical bitcoin speculation or holding that most people engage in.
 
-Well, you can't blame me, becuase since the emergence of ethereum which purpose was to allow buidling of programable apps due to bitcoin failure of allowing that. I pretty much closed my mind to that possibility. 
+You can't hold it against me, though, because ethereum was created in response to bitcoin's failure to support the development of programmable apps. I essentially dismissed that possibility.
 
-Certainly, I will put that kind of idealogy in check as should you. In the blockchain space, new technologies are emerging every now and then and to keep up with pace you have to stay open and keep up to date.
+Yes, I will definitely check that kind of idealogy, and so should you. New technologies are constantly being developed in the blockchain industry, so it's important to stay informed and open to new developments if you want to keep up.
 
-That been said, lets get to it.
+Having said that, let's begin.
 
 ### What you Will  Learn
 In this tutorial, you will learn the following:

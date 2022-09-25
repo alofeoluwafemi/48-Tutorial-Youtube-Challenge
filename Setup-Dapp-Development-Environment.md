@@ -1,5 +1,6 @@
 ## Setting Up a Dapp Development Scaffold
 
+Building a preset to facilitate your dapp development building and structure.
 
 ![Setting Up a Dapp Development Scaffold](https://s3.amazonaws.com/alofe.oluwafemi/Dapp-Setup-Youtube-Banner.png)
 
@@ -406,8 +407,8 @@ Now, proceed to commit your files and see how this run. To confirm this work, ad
 PRIVATE_KEY="0x596F752063616E27742077697468647261772079657400000000000000000000"
 ```
 
-The commit process will exit with a status 1.
+Congratulation!! 🎉🎉
 
-Thank you for sticking this far with me, If you enjoyed this article you can support me by Clapping for this post.
+Thank you for sticking this far with me, If you enjoyed this article you can support me by Clapping for this post and subscribing to my [youtube channel](https://www.youtube.com/channel/UCO3mWoCZ_iqRPRvUeg9oG2A).
 
 [![Foo](https://s3.amazonaws.com/alofe.oluwafemi/Join+Blockchain+Academy.png)](https://t.me/+Og9C3Z23lpc5MWRk/)

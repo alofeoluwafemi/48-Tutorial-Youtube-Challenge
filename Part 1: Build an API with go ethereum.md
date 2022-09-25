@@ -3,9 +3,13 @@
 
 ## Part 1: Building a Complete API to Interact with an P2P Escrow Smart Contract using go-ethereum Client & GoFiber Framework
 
-This is the first of the two post of this series
+This is the first part of the two post in this series
 - [Part 1: Project Overview, Setup Fiber, Generate Go Binding, Deploy Contract, Add get Escrow & Wallet Logic Address endpoint](https://)
-- [Part 2: Add and Conclude Orders endpoint](https://)
+- [Part 2: Add and Conclude P2P API endpoints](https://)
+
+You can fork the codebase here on [github](https://github.com/alofeoluwafemi/smart-contract-api-go-ethereum)  as a reference to follow along.
+
+Here is the  API Postman Collection [Link](https://www.getpostman.com/collections/362a5590ccf482592588) for you to import.
 
 ## Introduction
 
@@ -13,25 +17,25 @@ This is the first of the two post of this series
 
 [Go Fiber framework](https://gofiber.io/) on the other hand is a Go web framework built on top of Fasthttp, the fastest HTTP engine for Go. Its similarities to Node express framwork and ease of use makes it attractive to new go developer to use for building API's for thier project. I for one found it easy to relate and quickly build with when I started geting into writing go lang.
 
-## What you Will  Learn
+### What you Will  Learn
 
 For this tutorial, I would be using an existing smart contract which is one of the first draft for an Escrow to statisfy a P2P platform  on [Pay by PiggyFi](https://piggyfi.africa), it was written during one of the Hackthons we participated in as a Proof of concept. You can [find the codebase here](https://github.com/orignellc/piggyfi-contracts-poc) and since the goal of this series is not to focus on building smart contract but  an API in go to interact with it, this contract serve our usage. 
 
 And don't worry, I will be doing a breakdown of the smart contract shortly below
 
 
-## Difficulty
+### Difficulty
 - Beginner :white_check_mark:
 - Intermidiate :white_check_mark:
 
-## Requirement
+### Requirement
 To get the best out of this tutorial, some [basic go lang](https://go.dev/learn/) understanding is needed. For my editor of choice I will be using [goland](https://www.jetbrains.com/go/), which in my opinion is by far the best go lang editor out there.
 
 Other than that having latest [solidity compile installed](https://docs.soliditylang.org/en/v0.8.9/installing-solidity.html) and obviously the latest [go compiler](https://go.dev/doc/install) is a requirement.
 
 Also make sure to get some [test ETH from Goerli](https://goerlifaucet.com/) , it will be needed to pay gas fees while deploying and interacting with the smart contracts.
 
-## Table of Content
+### Table of Content
 
 #### Part 1 of this article covers
 - Project Overview
@@ -794,7 +798,7 @@ The current http method we are using on the deploy usdc route is GET, now change
 deploy.Post("/usdc", controllers.DeployUSDC)
 ```
 
-Again restart the server and from Postman call your URL and a new smart contract will be deployed. You can confirm using the transaction hash.
+Again restart the server and from Postman make a `GET request to http://127.0.0.1:3000/api/v1/deploy/usdc and a new smart contract will be deployed. You can confirm using the transaction hash.
 
 ![Deploy Contract on Post man](https://s3.amazonaws.com/alofe.oluwafemi/Screen+Shot+2022-09-11+at+5.24.09+PM.png)
 
@@ -832,7 +836,7 @@ func (clientCon *ClientConnection) DeployFactory() (common.Address, *types.Trans
 }
 ```
 
-Now in Postman if you make a POST request to http://127.0.0.1:3000/api/v1/deploy/factory the Factory contract will be deployed.
+Restart fiber server and  in Postman make a POST request to http://127.0.0.1:3000/api/v1/deploy/factory the Factory contract will be deployed.
 
 ![Deploy Contract with Postman](https://s3.amazonaws.com/alofe.oluwafemi/Screen+Shot+2022-09-11+at+11.06.11+PM.png)
 
@@ -870,7 +874,7 @@ func (clientCon ClientConnection) NewFactory(address string) {
 }
 ```
 
-And Finnally the `GetLogicAddress` method.
+And Finally the `GetLogicAddress` method.
 
 ```go
 func (clientCon ClientConnection) GetLogicAddress() common.Address {
@@ -972,7 +976,7 @@ func (clientCon ClientConnection) GetLogicAddress() common.Address {
 }
 ```
 
-Using Postman, make a GET request to http://127.0.0.1:3000/api/v1/wallet-logic-address.
+Restart Fiber serve and using Postman, make a GET request to http://127.0.0.1:3000/api/v1/wallet-logic-address.
 
 ![Wallet Logic Address](https://s3.amazonaws.com/alofe.oluwafemi/Screen+Shot+2022-09-12+at+1.40.37+AM.png)
 
@@ -1010,7 +1014,7 @@ func (clientCon ClientConnection) GetEscrowAddress() common.Address {
    return address  
 }
 ```
-Using Postman, make a GET request to http://127.0.0.1:3000/api/v1/escrow-address.
+Restart fiber server and using Postman, make a GET request to http://127.0.0.1:3000/api/v1/escrow-address.
 
 ![Get Escrow Address](https://s3.amazonaws.com/alofe.oluwafemi/Screen+Shot+2022-09-12+at+2.19.47+AM.png)
 
@@ -1023,3 +1027,7 @@ In the concluding article we are going to finish up the other endpoint that inte
 
 ### What's Next ?
 [Read Part 2 of Building a Complete API to Interact with an P2P Escrow Smart Contract using go-ethereum Client & GoFiber Framework](https://)
+
+Thank you for sticking this far with me, If you enjoyed this article you can support me by Clapping for this post and subscribing to my [youtube channel](https://www.youtube.com/channel/UCO3mWoCZ_iqRPRvUeg9oG2A).
+
+[![Foo](https://s3.amazonaws.com/alofe.oluwafemi/Join+Blockchain+Academy.png)](https://t.me/+Og9C3Z23lpc5MWRk/)

@@ -6,6 +6,8 @@ This is the second part of the two post in this series
 
 You can fork the codebase here on [github](https://github.com/alofeoluwafemi/smart-contract-api-go-ethereum)  as a reference to follow along. 
 
+Here is the  API Postman Collection [Link](https://www.getpostman.com/collections/362a5590ccf482592588) for you to import.
+
 ## Introduction
 
 [Go ethereum](https://geth.ethereum.org/) is the official go implementation of the ethereum protocol. Miners can use it to run an ethereum node and Dapp developers such as you can use some of its packages to compile your smart contract to bytecode, deploy it to a network and use it to interact with your deployed smart contract.
@@ -303,6 +305,34 @@ In my own case my two acccount address returned are
 | b93e42b0-33a2-11ed-a261-0242ac120002 | 0xC1F07Db647Aa3002c12BbaF8D598F0ef19c4ddd3 |
 |cec3df26-339a-11ed-a261-0242ac120002|0x63cc2DD4d1836bA66B40B3dEBfcA7896256c24d0|
 
+### Fix Nonce Too Low Error
+Up until now you may have been experiencing a revert error with **nonce too low** returned. As seen below, it took me a while to realize I've introduced this problem when setting the nonce is transact options. To fix this simply add the method belwo and in every method passing `clientCon.trxOpts` meaning its a state changing method, call this to increment the nonce for the next Transaction.
+
+```go
+func (clientCon ClientConnection) postTransact() {
+	clientCon.trxOpts.Nonce = new(big.Int).SetUint64(clientCon.nonceAt(clientCon.SignerPublicAddress))
+}
+```
+
+**Usage**
+
+```go
+func (clientCon ClientConnection) NewWallet(uuid string) (*types.Transaction, error) {
+
+	trx, err := getFactory().NewCustodian(clientCon.trxOpts, uuid)
+
+	if err != nil {
+		log.Printf("Cannot create new wallet: %v", err)
+
+		return new(types.Transaction), err
+	}
+
+	clientCon.postTransact()
+
+	return trx, nil
+}
+```
+
 ### Fund the Account Addresses with USDC (Mock)
 
 Open Metamask and click on **import token**, enter the deployed USDC address, make sure you do that to the wallet address you used the Private key as deployer acccount in env. All initial token will be assigned the account, see image below.
@@ -314,9 +344,143 @@ Fund both  addressess with 100 USDC using metamask.
 ### Open P2P Buy Order
 The `newBuyOrder` function is directly available on the wallet address. Remember each wallet is a smart contract and not an EOA, like you would expect. And our deployer account has like the super admin priviledge to call methods on it. 
 
-This system is making use of a proxy contract approach, such that in the future we can add more features to already deployed wallet by simply upgrading the Wallet Logic which is never executed on its own but its functions called via `delegatecall`.
+This approach is making use of the proxy pattern, such that in the future we can add more features to already deployed wallet by simply upgrading the Wallet Logic, which is never executed on its own but its functions are called via `delegatecall` using the state of Wallet Proxy which is deployed .
 
+**Add Route**
 
+Where the `:address` param is the custodian wallet address opening this trade.
 
+```go
+api.Post("/wallet/order/new/:address", controllers.NewBuyOrder)
+```
+
+**Add Controller Method**
+
+```go
+func NewBuyOrder(c *fiber.Ctx) error {
+	conn := blockchain.CurrentConnection
+	request := new(blockchain.Order)
+	wallet := c.Params("address")
+
+	blockchain.WalletAddress = wallet
+
+	if err := c.BodyParser(request); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Malformed data",
+			"data":    err,
+		})
+	}
+
+	trx, err := conn.OpenBuyOrder(*request)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"status":  "error",
+			"message": err,
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status": "success",
+		"data":   trx.Hash(),
+	})
+}
+```
+
+And finnaly inside `wallet.go` in the blockchain package.
+
+```go
+func (clientCon ClientConnection) OpenBuyOrder(order Order) (*types.Transaction, error) {
+
+	trx, err := getWalletLogic().NewBuyOrder(
+		clientCon.trxOpts,
+		common.HexToAddress(order.Seller),
+		common.HexToAddress(order.Receiver),
+		big.NewInt(order.Amount),
+		big.NewInt(order.Rate),
+		big.NewInt(order.Fee),
+	)
+
+	if err != nil {
+		log.Printf("Cannot open order : %v", err)
+
+		return new(types.Transaction), err
+	}
+
+	clientCon.postTransact()
+
+	return trx, nil
+}
+```
+
+Making a POST request to http://127.0.0.1:3000/api/v1/wallet/order/new/0xC1F07Db647Aa3002c12BbaF8D598F0ef19c4ddd3 using Postman will return the transaction hash. 
+
+Remember to substitute the wallet address paramer in the URL with whats applicable to you.
 
 ### Get Account Total Balance After Open Order
+
+Finally to the last bit!
+
+The Wallet contract has the `GetTotalBalance`  that returns the wallet balance minus the current Open Orders, so once we open the order we dont wnat them spending and not able to fufill the order.
+
+**Add Route**
+
+```go
+api.Post("/wallet/balance/:address", controllers.GetWalletUSDCBalance)
+```
+
+**Add Controller Method**
+
+In `wallet_controller` add
+
+```go
+func GetWalletUSDCBalance(c *fiber.Ctx) error {  
+  conn := blockchain.CurrentConnection  
+  walletAddress := c.Params("address")  
+  
+   blockchain.WalletAddress = walletAddress  
+  
+   balance, err := conn.GetUSDCBalance()  
+  
+   if err != nil {  
+      return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{  
+         "status":  "error",  
+         "message": err,  
+         "data":    nil,  
+      })  
+   }  
+  
+  
+   return c.Status(fiber.StatusOK).JSON(fiber.Map{  
+      "status": "success",  
+      "data":   balance,  
+   })  
+}
+```
+
+Now add the `GetUSDCBalance` method in `wallet.go` inside the blockchain package.
+
+```go
+func (clientCon ClientConnection) GetUSDCBalance() (*big.Int, error) {
+
+	balance, err := getWalletLogic().GetTotalBalance(clientCon.callOpts)
+
+	if err != nil {
+		log.Printf("Cannot open order : %v", err)
+
+		return new(big.Int), err
+	}
+
+	return balance, nil
+}
+```
+
+Making a POST request to http://127.0.0.1:3000/api/v1/wallet/balance/0xC1F07Db647Aa3002c12BbaF8D598F0ef19c4ddd3 using Postman. The wallet balance is returned.
+
+Congratulation!! 🎉🎉
+
+Thank you for sticking this far with me, If you enjoyed this article you can support me by Clapping for this post and subscribing to my [youtube channel](https://www.youtube.com/channel/UCO3mWoCZ_iqRPRvUeg9oG2A).
+
+[![Foo](https://s3.amazonaws.com/alofe.oluwafemi/Join+Blockchain+Academy.png)](https://t.me/+Og9C3Z23lpc5MWRk/)
